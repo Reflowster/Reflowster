@@ -1,6 +1,11 @@
-#include "Arduino.h"
+#include <Arduino.h>
+#include <SPI.h>
+#include <Encoder.h>
+#include <Adafruit_MAX31855.h>
+#include <Adafruit_NeoPixel.h>
+#include "ReflowDisplay.h"
+
 #include "Reflowster.h"
-#include "Adafruit_MAX31855.h"
 
 Reflowster::Reflowster() {
   pinConfiguration_statusLed = 12;
@@ -218,7 +223,7 @@ double Reflowster::readCelsius() {
 }
 
 double Reflowster::readFahrenheit() {
-  return probe->readFarenheit(); //note, tbe misspelling in the adafruit library
+  return probe->readFarenheit(); //note, the misspelling in the adafruit library
 }
 
 // Relay

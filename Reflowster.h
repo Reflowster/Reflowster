@@ -1,13 +1,8 @@
 #ifndef Reflowster_h
 #define Reflowster_h
 
-#include "Arduino.h"
-#include <Adafruit_NeoPixel.h>
-#include <SPI.h>
-#include <Encoder.h>
-#include "ReflowDisplay.h"
-
 class Adafruit_MAX31855;
+class ReflowDisplay;
 
 class Reflowster {
 public:
