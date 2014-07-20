@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include <Adafruit_MAX31855.h>
 #include <Adafruit_NeoPixel.h>
+#include <ReflowDisplay.h>
 #include "Reflowster.h"
 
 Reflowster reflowster;
