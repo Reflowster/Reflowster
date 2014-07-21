@@ -56,6 +56,7 @@ ReflowDisplay::ReflowDisplay(int cDS, int cSTCP, int cSHCP, int cD1, int cD2, in
   displayedDigits[0] = 0;
   displayedDigits[1] = 0;
   displayedDigits[2] = 0;
+  displayedDigits[3] = 0;
   marqueeString = "\0";
   marqueeLength = 0;
   marqueeIndex = 0;
@@ -69,6 +70,7 @@ void ReflowDisplay::display(int n) {
     n = n*-1;
     neg = 1;
   }
+  displayedDigits[3] = 0;
   displayedDigits[2] = numerals[n % 10] | (neg?0b10000000:0); //TODO fix the way we handle negative numbers
   displayedDigits[1] = n < 10 ? 0 : numerals[(n/10) % 10];
   displayedDigits[0] = n < 100 ? 0 : numerals[(n/100) % 10]; 
@@ -100,7 +102,6 @@ void ReflowDisplay::clear() {
 void ReflowDisplay::marqueeHandler() {
   if (marqueeLength == 0) return; //no current marquee
   
-  //if (marqueeIndex >= 0 && marqueeIndex <= marqueeLength-3) {
    if (marqueeIndex >= marqueeLength-3+MARQUEE_END_WAIT) { //last index after the end pause is blank
      displayChars("   ",3);
    } else if (marqueeIndex >= marqueeLength-3) { //after scrolling, pause on the last 3 chars
@@ -134,6 +135,7 @@ void ReflowDisplay::displayChars(char * chars, int len) {
   displayedDigits[0] = getLetter(chars[0]);
   displayedDigits[1] = len > 1 ? getLetter(chars[1]) : 0;
   displayedDigits[2] = len > 2 ? getLetter(chars[2]) : 0;
+  displayedDigits[3] = 0;
 }
 
 void ReflowDisplay::setSegment(byte segment, byte index) {
@@ -148,14 +150,16 @@ void ReflowDisplay::tick() {
   
   displayDigit(displayedDigits[tickCounter],tickCounter); //cycles through the digits displaying each one for a tick
   
-  tickCounter = ( tickCounter+1 ) % 3;
+  tickCounter = ( tickCounter+1 ) % 4;
 }
 
 void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
   digitalWrite(pinConfiguration_D1,LOW);
   digitalWrite(pinConfiguration_D2,LOW);
   digitalWrite(pinConfiguration_D3,LOW);
+  digitalWrite(pinConfiguration_DL,LOW);
   
+  //TODO remove this hack
   //This is a hack because our hardware is broken.. it resets the display before changing the display digit to prevent ghosting
   digitalWrite(pinConfiguration_STCP, LOW);
   for (char i=0; i<8; i++) {
@@ -168,9 +172,11 @@ void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
   digitalWrite(pinConfiguration_D1,displayDigit == 0 ? HIGH : LOW);
   digitalWrite(pinConfiguration_D2,displayDigit == 1 ? HIGH : LOW);
   digitalWrite(pinConfiguration_D3,displayDigit == 2 ? HIGH : LOW);
+  digitalWrite(pinConfiguration_DL,displayDigit == 3 ? HIGH : LOW);
   
   //This is performing the pin mapping to account for the arbitrary order of the lettered display pins with the output pins of the shift register
-  unsigned char mapped = (0b10000000 & (segments << 0)) | //TODO make this clearer and more obvious??
+  unsigned char mapped =
+                (0b10000000 & (segments << 0)) | //TODO make this clearer and more obvious??
                 (0b01000000 & (segments << 3)) |
                 (0b00100000 & (segments << 1)) |
                 (0b00010000 & (segments << 2)) |
@@ -194,6 +200,7 @@ void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
 //  digitalWrite(pinConfiguration_D1,LOW);
 //  digitalWrite(pinConfiguration_D2,LOW);
 //  digitalWrite(pinConfiguration_D3,LOW);
+//  digitalWrite(pinConfiguration_DL,LOW);
 //
 //  unsigned char mapped = (0b10000000 & (segments << 0)) | //TODO make this clearer and more obvious??
 //                (0b01000000 & (segments << 3)) |
@@ -216,4 +223,5 @@ void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
 //  digitalWrite(pinConfiguration_D1,displayDigit == 0 ? HIGH : LOW);
 //  digitalWrite(pinConfiguration_D2,displayDigit == 1 ? HIGH : LOW);
 //  digitalWrite(pinConfiguration_D3,displayDigit == 2 ? HIGH : LOW);
+//  digitalWrite(pinConfiguration_DL,displayDigit == 3 ? HIGH : LOW);
 //}

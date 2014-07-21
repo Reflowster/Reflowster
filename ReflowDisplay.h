@@ -28,7 +28,7 @@ private:
 
   int tickCounter;
   unsigned long marqueeTimer;
-  byte displayedDigits[3];
+  byte displayedDigits[4];
   char * marqueeString;
   int marqueeLength;
   int marqueeIndex;

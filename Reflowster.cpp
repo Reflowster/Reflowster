@@ -183,7 +183,7 @@ void Reflowster::displayTest() {
   int i,l;
   byte testSegments[8] = {0b00000010,0b01000000,0b00100000,0b00010000,0b00001000,0b00000100,0b00000001,0b10000000};
   for (l=0; l<8; l++) {
-    for (i=0; i<3; i++) {
+    for (i=0; i<4; i++) {
       display->setSegment(testSegments[l],i);
     }
     delay(50);
