@@ -139,7 +139,16 @@ void ReflowDisplay::displayChars(char * chars, int len) {
 }
 
 void ReflowDisplay::setSegment(byte segment, byte index) {
+  marqueeLength = 0;
   displayedDigits[index] = segment;
+}
+
+void ReflowDisplay::setSegments(byte a, byte b, byte c, byte d) {
+  marqueeLength = 0;
+  displayedDigits[0] = a;
+  displayedDigits[1] = b;
+  displayedDigits[2] = c;
+  displayedDigits[3] = d;
 }
 
 void ReflowDisplay::tick() {

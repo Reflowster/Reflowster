@@ -12,6 +12,7 @@ public:
   void displayMarquee(char * chars);
   boolean marqueeComplete();
   void setSegment(byte segment, byte index);
+  void setSegments(byte a, byte b, byte c, byte d);
   void tick();
   void clear();
   

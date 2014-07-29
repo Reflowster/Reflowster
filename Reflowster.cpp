@@ -67,7 +67,7 @@ void Reflowster::selfTest() {
   beep(230,150);
   delay(150); 
   
-  display->display("enc");
+  display->setSegments(0b11111111,0b11111111,0b11111111,0b11111111);
   while(!getButton());
   
   setStatusColor(25,0,0);
