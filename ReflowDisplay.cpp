@@ -142,7 +142,7 @@ void ReflowDisplay::setSegment(byte segment, byte index) {
   marqueeLength = 0;
   displayedDigits[index] = segment;
 }
-
+ 
 void ReflowDisplay::setSegments(byte a, byte b, byte c, byte d) {
   marqueeLength = 0;
   displayedDigits[0] = a;
