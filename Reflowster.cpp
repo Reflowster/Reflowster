@@ -188,6 +188,8 @@ void Reflowster::displayTest() {
     }
     delay(50);
   }
+  display->display(888);
+  delay(200);
 }
 
 // Buttons
