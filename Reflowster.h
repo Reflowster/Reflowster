@@ -40,6 +40,7 @@ public:
   int getKnobPosition();
   double readCelsius();
   double readFahrenheit();
+  double readInternalC();
   void relayOn();
   void relayOff();
   void relayToggle();

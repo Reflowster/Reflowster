@@ -228,6 +228,10 @@ double Reflowster::readFahrenheit() {
   return probe->readFarenheit(); //note, the misspelling in the adafruit library
 }
 
+double Reflowster::readInternalC() {
+  return probe->readInternal(); //note, the misspelling in the adafruit library
+}
+
 // Relay
 ////////
 void Reflowster::relayOn() {
