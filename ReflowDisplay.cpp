@@ -159,7 +159,7 @@ void ReflowDisplay::tick() {
   
   displayDigit(displayedDigits[tickCounter],tickCounter); //cycles through the digits displaying each one for a tick
   
-  tickCounter = ( tickCounter+1 ) % 4;
+  tickCounter = ( tickCounter+1 ) & 0b00000011;
 }
 
 void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
