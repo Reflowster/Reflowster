@@ -23,6 +23,7 @@ public:
   int pinConfiguration_thermocoupleCS;
   int pinConfiguration_thermocoupleSCK;
   int pinConfiguration_thermocoupleMISO;
+  int MAX_ALLOWABLE_INTERNAL;
   
   Reflowster();
   void init();

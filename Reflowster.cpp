@@ -25,11 +25,12 @@ Reflowster::Reflowster() {
   pinConfiguration_thermocoupleCS = 1;
   pinConfiguration_thermocoupleSCK = SCK;
   pinConfiguration_thermocoupleMISO = MISO;
+  MAX_ALLOWABLE_INTERNAL = 55; //degrees C; rough limit to protect Reflowster
 }
 
 void Reflowster::init() {
   status = new Adafruit_NeoPixel(1, pinConfiguration_statusLed, NEO_GRB + NEO_KHZ800);
-  knob = new Encoder(pinConfiguration_encoderA, pinConfiguration_encoderB);
+  knob = new Encoder(pinConfiguration_encoderB, pinConfiguration_encoderA);
   probe = new Adafruit_MAX31855(pinConfiguration_thermocoupleSCK,pinConfiguration_thermocoupleCS,pinConfiguration_thermocoupleMISO);
   display = new ReflowDisplay(pinConfiguration_displayDS,pinConfiguration_displaySTCP,pinConfiguration_displaySHCP,pinConfiguration_displayD1,pinConfiguration_displayD2,pinConfiguration_displayD3,pinConfiguration_displayDL);
   
@@ -234,9 +235,16 @@ double Reflowster::readInternalC() {
 
 // Relay
 ////////
-void Reflowster::relayOn() {
-  digitalWrite(pinConfiguration_relay,HIGH);
-  Serial.println("Relay ON");
+void Reflowster::relayOn() { //can we add a return to this one to indicate if it worked?
+  double temp = readInternalC();
+	if (temp <= (MAX_ALLOWABLE_INTERNAL-5)) { //overheat protection prohibits relay from coming on; degrees C
+		digitalWrite(pinConfiguration_relay,HIGH);
+    Serial.println("Relay ON");
+  } else {
+	  Serial.print("Error: Relay Locked Off; Too Hot ");
+		Serial.print(temp);
+		Serial.println("C");
+	}
 }
 
 void Reflowster::relayOff() {
