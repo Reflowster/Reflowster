@@ -130,6 +130,7 @@ void Reflowster::selfTest() {
 
 void Reflowster::tick() {
   display->tick();
+	pulseTick();
 }
 
 long lastPulseCall = millis();
@@ -146,7 +147,7 @@ void Reflowster::beep(int freq, int duration) {
    tone(pinConfiguration_beep,freq,duration); 
 }
 
-// Status
+// Status LED
 /////////
 void Reflowster::setStatusColor(byte r, byte g, byte b) {
   pulseStatus = -1;
@@ -182,15 +183,21 @@ ReflowDisplay * Reflowster::getDisplay() {
 
 void Reflowster::displayTest() {
   int i,l;
-  byte testSegments[8] = {0b00000010,0b01000000,0b00100000,0b00010000,0b00001000,0b00000100,0b00000001,0b10000000};
+	byte testSegments[8] = {0b00000010,0b01000000,0b00100000,0b00010000,0b00001000,0b00000100,0b00000001,0b10000000};
   for (l=0; l<8; l++) {
     for (i=0; i<4; i++) {
       display->setSegment(testSegments[l],i);
     }
     delay(50);
   }
-  display->display(888);
-  delay(200);
+  //display->display(888);
+	setStatusColor(20,0,0);
+	delay(70);
+	setStatusColor(0,20,0);
+	delay(70);
+	setStatusColor(0,0,20);
+	delay(70);
+	setStatusColor(0,0,0);
 }
 
 // Buttons
