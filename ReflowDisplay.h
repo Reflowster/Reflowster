@@ -6,6 +6,9 @@
 class ReflowDisplay {
 public:
   ReflowDisplay(int DS, int STCP, int SHCP, int D1, int D2, int D3, int DL); //setup constructor
+
+  int marqueeStartWait;
+  int marqueeEndWait;
   
   void display(int n);
   void display(char * s);
@@ -16,7 +19,6 @@ public:
   void tick();
   void clear();
   
-  void displayDigit(byte segments, byte displayDigit);  //TODO make private
   
 private:
   int pinConfiguration_DS;
@@ -39,6 +41,7 @@ private:
   void displayChars(char * chars, int len);
   void stopMarquee();
   void marqueeHandler();
+  void displayDigit(byte segments, byte displayDigit);
   
   static byte numerals[];
   static byte alphabet[];

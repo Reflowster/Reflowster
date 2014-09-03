@@ -1,9 +1,5 @@
 #include "ReflowDisplay.h"
 
-//TODO remove these, but keep the function somehow
-int MARQUEE_START_WAIT = 3;
-int MARQUEE_END_WAIT = 3;
-
 byte ReflowDisplay::numerals[] = {0b01111110,0b00110000,0b01101101,0b01111001,0b00110011,0b01011011,0b00011111,0b01110000,0b01111111,0b01110011};
 byte ReflowDisplay::alphabet[] = {
     0b01110111, //a
@@ -35,6 +31,9 @@ byte ReflowDisplay::alphabet[] = {
 };
 
 ReflowDisplay::ReflowDisplay(int cDS, int cSTCP, int cSHCP, int cD1, int cD2, int cD3, int cDL) {
+  marqueeStartWait = 3;
+  marqueeEndWait = 3;
+
   pinConfiguration_DS = cDS;
   pinConfiguration_STCP = cSTCP;
   pinConfiguration_SHCP = cSHCP;
@@ -88,7 +87,7 @@ boolean ReflowDisplay::marqueeComplete() {
 }
 
 void ReflowDisplay::displayMarquee(char * chars) {
-  marqueeIndex = -MARQUEE_START_WAIT;
+  marqueeIndex = -marqueeStartWait;
   marqueeCompleteFlag = false;
   marqueeString = chars;
   marqueeLength = strlen(chars);
@@ -102,21 +101,21 @@ void ReflowDisplay::clear() {
 void ReflowDisplay::marqueeHandler() {
   if (marqueeLength == 0) return; //no current marquee
   
-   if (marqueeIndex >= marqueeLength-3+MARQUEE_END_WAIT) { //last index after the end pause is blank
+   if (marqueeIndex >= marqueeLength-3+marqueeEndWait) { //last index after the end pause is blank
      displayChars("   ",3);
    } else if (marqueeIndex >= marqueeLength-3) { //after scrolling, pause on the last 3 chars
      displayChars(marqueeString+marqueeLength-3,3);
    } else if (marqueeIndex >= 0) { //this is the meat of the string and the scroll
      displayChars(marqueeString+marqueeIndex,3);
-   } else if (marqueeIndex == -MARQUEE_START_WAIT) { //prior to scrolling, pause on the first 3 chars
+   } else if (marqueeIndex == -marqueeStartWait) { //prior to scrolling, pause on the first 3 chars
      displayChars(marqueeString,marqueeLength <= 3 ? marqueeLength : 3);
    }
   
   if (marqueeLength > 3) marqueeIndex++;  //no scrolling unless the string is more than 3 chars long
-  if (marqueeIndex >= marqueeLength-3+MARQUEE_END_WAIT+1) {
+  if (marqueeIndex >= marqueeLength-3+marqueeEndWait+1) {
     //marquee has wrapped.. we consider it complete now
     marqueeCompleteFlag = true;
-    marqueeIndex = -MARQUEE_START_WAIT;
+    marqueeIndex = -marqueeEndWait;
   }
 }
 
@@ -152,7 +151,7 @@ void ReflowDisplay::setSegments(byte a, byte b, byte c, byte d) {
 }
 
 void ReflowDisplay::tick() {
-  if ((millis() - marqueeTimer) > 200) {
+  if ((millis() - marqueeTimer) > 300) {
     marqueeHandler();
     marqueeTimer = millis();
   }
@@ -168,50 +167,7 @@ void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
   digitalWrite(pinConfiguration_D3,LOW);
   digitalWrite(pinConfiguration_DL,LOW);
   
-  //TODO remove this hack
-  //This is a hack because our hardware is broken.. it resets the display before changing the display digit to prevent ghosting
-  // digitalWrite(pinConfiguration_STCP, LOW);
-  // for (char i=0; i<8; i++) {
-    // digitalWrite(pinConfiguration_SHCP,LOW);
-    // digitalWrite(pinConfiguration_DS,1);
-    // digitalWrite(pinConfiguration_SHCP,HIGH);
-  // }
-  // digitalWrite(pinConfiguration_STCP, HIGH);
-  
-  // digitalWrite(pinConfiguration_D1,displayDigit == 0 ? HIGH : LOW);
-  // digitalWrite(pinConfiguration_D2,displayDigit == 1 ? HIGH : LOW);
-  // digitalWrite(pinConfiguration_D3,displayDigit == 2 ? HIGH : LOW);
-  // digitalWrite(pinConfiguration_DL,displayDigit == 3 ? HIGH : LOW);
-  
-  // This is performing the pin mapping to account for the arbitrary order of the lettered display pins with the output pins of the shift register
-  // unsigned char mapped =
-                // (0b10000000 & (segments << 0)) | //TODO make this clearer and more obvious??
-                // (0b01000000 & (segments << 3)) |
-                // (0b00100000 & (segments << 1)) |
-                // (0b00010000 & (segments << 2)) |
-                // (0b00001000 & (segments << 2)) |
-                // (0b00000100 & (segments >> 4)) |
-                // (0b00000010 & (segments >> 4)) |
-                // (0b00000001 & (segments << 0));
-
-  // digitalWrite(pinConfiguration_STCP, LOW);
-  // for (char i=0; i<8; i++) {
-    // digitalWrite(pinConfiguration_SHCP,LOW);
-    // digitalWrite(pinConfiguration_DS,!(mapped&1));
-    // digitalWrite(pinConfiguration_SHCP,HIGH);
-    // mapped = mapped >> 1;
-  // }
-  // digitalWrite(pinConfiguration_STCP, HIGH);
-// }
-
-//TODO reinstate me when the hardware is fixed
-//void displayDigitFix(byte segments, byte displayDigit) {
-//  digitalWrite(pinConfiguration_D1,LOW);
-//  digitalWrite(pinConfiguration_D2,LOW);
-//  digitalWrite(pinConfiguration_D3,LOW);
-//  digitalWrite(pinConfiguration_DL,LOW);
-
- unsigned char mapped = (0b10000000 & (segments << 0)) | //TODO make this clearer and more obvious??
+  unsigned char mapped = (0b10000000 & (segments << 0)) |
                (0b01000000 & (segments << 3)) |
                (0b00100000 & (segments << 1)) |
                (0b00010000 & (segments << 2)) |
@@ -220,17 +176,17 @@ void ReflowDisplay::displayDigit(byte segments, byte displayDigit) {
                (0b00000010 & (segments >> 4)) |
                (0b00000001 & (segments << 0));
 
- digitalWrite(pinConfiguration_STCP, LOW);
- for (char i=0; i<8; i++) {
-   digitalWrite(pinConfiguration_SHCP,LOW);
-   digitalWrite(pinConfiguration_DS,!(mapped&1));
-   digitalWrite(pinConfiguration_SHCP,HIGH);
-   mapped = mapped >> 1;
- }
- digitalWrite(pinConfiguration_STCP, HIGH);
+  digitalWrite(pinConfiguration_STCP, LOW);
+  for (char i=0; i<8; i++) {
+    digitalWrite(pinConfiguration_SHCP,LOW);
+    digitalWrite(pinConfiguration_DS,!(mapped&1));
+    digitalWrite(pinConfiguration_SHCP,HIGH);
+    mapped = mapped >> 1;
+  }
+  digitalWrite(pinConfiguration_STCP, HIGH);
  
- digitalWrite(pinConfiguration_D1,displayDigit == 0 ? HIGH : LOW);
- digitalWrite(pinConfiguration_D2,displayDigit == 1 ? HIGH : LOW);
- digitalWrite(pinConfiguration_D3,displayDigit == 2 ? HIGH : LOW);
- digitalWrite(pinConfiguration_DL,displayDigit == 3 ? HIGH : LOW);
+  digitalWrite(pinConfiguration_D1,displayDigit == 0 ? HIGH : LOW);
+  digitalWrite(pinConfiguration_D2,displayDigit == 1 ? HIGH : LOW);
+  digitalWrite(pinConfiguration_D3,displayDigit == 2 ? HIGH : LOW);
+  digitalWrite(pinConfiguration_DL,displayDigit == 3 ? HIGH : LOW);
 }
