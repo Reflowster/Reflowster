@@ -151,6 +151,7 @@ void Reflowster::beep(int freq, int duration) {
 /////////
 void Reflowster::setStatusColor(byte r, byte g, byte b) {
   pulseStatus = -1;
+  status->setBrightness(255);
   status->setPixelColor(0, status->Color(r,g,b));
   status->show(); 
 }
